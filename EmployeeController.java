@@ -1,4 +1,4 @@
-package Controller;
+package com.howtodoinjava.demo.web;
 
 import java.util.List;
 
@@ -10,16 +10,18 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import Entity.EmployeeEntity;
-import Service.EmployeeService;
- 
+import com.howtodoinjava.demo.exception.RecordNotFoundException;
+import com.howtodoinjava.demo.model.EmployeeEntity;
+import com.howtodoinjava.demo.service.EmployeeService;
+import com.howtodoinjava.demo.vm.EmployeeVm;
  
 @RestController
 @RequestMapping("/employees")
-public class EmployeeController 
+public class EmployeeController
 {
     @Autowired
     EmployeeService service;
@@ -32,23 +34,23 @@ public class EmployeeController
     }
  
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeEntity> getEmployeeById(@PathVariable("id") Long id) 
-                                                    throws Exception {
+    public ResponseEntity<EmployeeEntity> getEmployeeById(@PathVariable("id") Long id)
+                                                    throws RecordNotFoundException {
         EmployeeEntity entity = service.getEmployeeById(id);
  
         return new ResponseEntity<EmployeeEntity>(entity, new HttpHeaders(), HttpStatus.OK);
     }
  
     @PostMapping
-    public ResponseEntity<EmployeeEntity> createOrUpdateEmployee(EmployeeEntity employee)
-                                                    throws Exception {
-        EmployeeEntity updated = service.createOrUpdateEmployee(employee);
+    public ResponseEntity<EmployeeEntity> createOrUpdateEmployee(@RequestBody EmployeeVm employeeVm)
+                                                    throws RecordNotFoundException {
+        EmployeeEntity updated = service.createOrUpdateEmployee(employeeVm);
         return new ResponseEntity<EmployeeEntity>(updated, new HttpHeaders(), HttpStatus.OK);
     }
  
     @DeleteMapping("/{id}")
-    public HttpStatus deleteEmployeeById(@PathVariable("id") Long id) 
-                                                    throws Exception {
+    public HttpStatus deleteEmployeeById(@PathVariable("id") Long id)
+                                                    throws RecordNotFoundException {
         service.deleteEmployeeById(id);
         return HttpStatus.FORBIDDEN;
     }

@@ -1,24 +1,27 @@
-package Service;
+package com.howtodoinjava.demo.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-
-import javax.management.AttributeNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import Entity.EmployeeEntity;
-import Repository.EmployeeRepository;
+import com.howtodoinjava.demo.exception.RecordNotFoundException;
+import com.howtodoinjava.demo.model.EmployeeEntity;
+import com.howtodoinjava.demo.repository.EmployeeRepository;
+import com.howtodoinjava.demo.vm.EmployeeVm;
  
-
 @Service
 public class EmployeeService {
      
     @Autowired
     EmployeeRepository repository;
      
+    @Autowired
+    EmployeeAddressService employeeAddressService;
+    
     public List<EmployeeEntity> getAllEmployees()
     {
         List<EmployeeEntity> employeeList = repository.findAll();
@@ -30,47 +33,63 @@ public class EmployeeService {
         }
     }
      
-    public EmployeeEntity getEmployeeById(Long id) throws Exception 
+    public EmployeeEntity getEmployeeById(Long id) throws RecordNotFoundException
     {
         Optional<EmployeeEntity> employee = repository.findById(id);
          
         if(employee.isPresent()) {
             return employee.get();
         } else {
-            throw new Exception("No employee record exist for given id");
+            throw new RecordNotFoundException("No employee record exist for given id");
         }
     }
      
-    public EmployeeEntity createOrUpdateEmployee(EmployeeEntity entity) throws Exception 
+    public EmployeeEntity createOrUpdateEmployee(EmployeeVm employeevm) throws RecordNotFoundException
     {
-        Optional<EmployeeEntity> employee = repository.findById(entity.getId());
          
-        if(employee.isPresent()) 
+        if(employeevm.getId()!=null)
         {
-            EmployeeEntity newEntity = employee.get();
-            newEntity.setEmail(entity.getEmail());
-            newEntity.setFirstName(entity.getFirstName());
-            newEntity.setLastName(entity.getLastName());
- 
+            EmployeeEntity employee = repository.getOne(employeevm.getId());
+
+        	employee.setEmail(employeevm.getEmail());
+        	employee.setFirstName(employeevm.getFirstName());
+
+
+        	employee.setLastName(employeevm.getLastName());
+            employee.setEmployee_address_id(employeeAddressService.createOrUpdateEmployeeAddress(employeevm.getEmployee_address_id()));
+        	employee = repository.save(employee);
+
+
+            return employee;
+                    
+
+        } else {
+             EmployeeEntity newEntity = new EmployeeEntity();
+            
+            newEntity.setEmail(employeevm.getEmail());
+            newEntity.setFirstName(employeevm.getFirstName());
+
+           
+            newEntity.setLastName(employeevm.getLastName());
+            newEntity.setEmployee_address_id( employeeAddressService.createOrUpdateEmployeeAddress(employeevm.getEmployee_address_id()));
             newEntity = repository.save(newEntity);
              
-            return newEntity;
-        } else {
-            entity = repository.save(entity);
-             
-            return entity;
+           
+            return newEntity; 
         }
-    } 
+    }
      
-    public void deleteEmployeeById(Long id) throws Exception 
+    public void deleteEmployeeById(Long id) throws RecordNotFoundException
     {
         Optional<EmployeeEntity> employee = repository.findById(id);
          
-        if(employee.isPresent()) 
+        if(employee.isPresent())
         {
             repository.deleteById(id);
         } else {
-            throw new Exception("No employee record exist for given id");
+            throw new RecordNotFoundException("No employee record exist for given id");
         }
-    } 
+        
+        
+    }
 }
