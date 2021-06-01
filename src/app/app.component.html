@@ -1,0 +1,49 @@
+<h1>Employee Name :</h1>
+
+ <form [formGroup]= "profileForm" (ngSubmit)="onSubmit()">
+  
+  <label>
+    First Name:
+    <input type="text" formControlName="firstname">
+  </label>
+
+  <br>
+  <label>
+    Last Name:
+    <input type="text" formControlName="lastname">
+  </label>
+ 
+  <label>
+    Email:
+    <input type="text" formControlName="email">
+  </label>
+
+    
+  <h2>Employee Address </h2>
+    
+      <label>
+        Addressline1:
+        <input type="text" formControlName="addressline1">
+      </label>
+     
+       <label>
+        Addressline2:
+        <input type="text" formControlName="addressline2">
+      </label>
+     
+      <label>
+        City:
+        <input type="text" formControlName="city">
+      </label>
+      
+      <label>
+        State:
+        <input type="text" formControlName="state">
+      </label>
+    
+      <label>
+        Pin Code:
+        <input type="text" formControlName="pin">
+      </label>
+    <button type="submit" [disabled]="!profileForm.valid">Submit</button>
+  </form>
